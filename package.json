@@ -1,10 +1,11 @@
 {
-  "name": "backend",
+  "name": "explore_backend",
   "version": "1.0.0",
   "description": "Backend for the Explore project",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
   },
   "author": "Utsav",
   "license": "ISC",

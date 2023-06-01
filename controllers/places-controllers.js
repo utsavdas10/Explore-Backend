@@ -1,7 +1,7 @@
 const uuid = require('uuid/v4');
 
 const HttpError = require('../models/http-error');
-const DUMMY_PLACES = require('../Dummy Data/places-data');
+let DUMMY_PLACES = require('../Dummy Data/places-data');
 
 
 
@@ -18,8 +18,8 @@ const getPlaceByPlaceId = (req, res, next) =>{
         const error = new HttpError('Could not find a place for the provided place id', 404);
         return next(error);
     }
-    return res.json(place);
-}
+    return res.json({place});
+};
 
 
 // api/places/user/:uid => GET [controller for getting a place by user id]
@@ -33,8 +33,8 @@ const getPlacesByUserId = (req, res, next) =>{
         const error = new HttpError('Could not find a place for the provided user id', 404);
         return next(error);
     }
-    return res.json(userPlaces);
-}
+    return res.json({userPlaces});
+};
 
 
 
@@ -54,7 +54,7 @@ const createPlace = (req, res, next) =>{
     DUMMY_PLACES.push(createdPlace);
 
     return res.status(201).json({place: createdPlace});
-}
+};
 
 
 
@@ -62,8 +62,18 @@ const createPlace = (req, res, next) =>{
 
 // api/places/:pid => PATCH [controller for updating a place]
 const updatePlace = (req, res, next) =>{
+    const placeId = req.params.pid;
+    const {title, description} = req.body;
 
-}
+    const updatedPlace = {...DUMMY_PLACES.find(p => p.id === placeId)}; // {...} is used to create a copy of the object
+    const placeIndex = DUMMY_PLACES.findIndex(p => p.id === placeId); 
+    updatedPlace.title = title;
+    updatedPlace.description = description;
+
+    DUMMY_PLACES[placeIndex] = updatedPlace;
+
+    return res.status(200).json({place: updatedPlace});
+};
 
 
 
@@ -71,8 +81,12 @@ const updatePlace = (req, res, next) =>{
 
 // api/places/:pid => DELETE [controller for deleting a place]
 const deletePlace = (req, res, next) =>{
+    const placeId = req.params.pid;
+    DUMMY_PLACES = DUMMY_PLACES.filter(p => p.id !== placeId);
 
-}
+    return res.status(200).json({message: 'Place deleted successfully'});
+};
+
 
 
 

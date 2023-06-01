@@ -1,19 +1,20 @@
+// Third party imports
 const express = require('express');
 
-const DUMMY_PLACES = require('../Dummy Data/places-data');
+// Local imports
+const placesControllers = require('../controllers/places-controllers');
 
+// Creating router
 const router = express.Router();
 
 
-router.get('/:pid', (req, res, next) =>{  
-    const placeId = req.params.pid;  
-    const place = DUMMY_PLACES.find(p => {
-        return p.id === placeId;
-    });
-    !place ?
-        res.status(404).json({message: 'Could not find a place for the provided id'}) 
-        : res.json({place});
-});
+// api/places/:pid => GET [ROUTE for getting a place by place id]
+router.get('/:pid', placesControllers.getPlaceByPlaceId);
 
 
+// api/places/user/:uid => GET [ROUTE for getting a place by user id]
+router.get('/user/:uid', placesControllers.getPlacesByUserId);
+
+
+// exporting router
 module.exports = router;

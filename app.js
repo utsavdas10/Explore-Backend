@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 // Local imports
 const placesRoutes = require('./routes/places-routes');
 const usersRoutes = require('./routes/users-routes');
-
+const HttpError = require('./models/http-error');
 
 //creating express app
 const app = express(); 
@@ -13,13 +13,19 @@ const app = express();
 
 //-----------------------Middlewares-----------------------//
 
-app.use(bodyParser.urlencoded({extended: true })); 
+// Body parser middleware
 app.use(bodyParser.json());
+
 
 // Routes middleware initialization
 app.use('/api/places' ,placesRoutes);  
-app.use(usersRoutes);
+app.use('api/users', usersRoutes);
 
+// Page not found middleware
+app.use((req, res, next) => {
+    const error = new HttpError('Could not find this route', 404);
+    throw error; 
+});
 
 // Error handling middleware
 app.use((error, req, res, next) => {
@@ -29,6 +35,8 @@ app.use((error, req, res, next) => {
     res.status(error.code || 500);
     res.json({message: error.message || 'An unknown error occurred!'});
 });
+
+
 
 
 

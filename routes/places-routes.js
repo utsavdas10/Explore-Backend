@@ -16,5 +16,9 @@ router.get('/:pid', placesControllers.getPlaceByPlaceId);
 router.get('/user/:uid', placesControllers.getPlacesByUserId);
 
 
+// api/places => POST [ROUTE for creating a place]
+router.post('/', placesControllers.createPlace);
+
+
 // exporting router
 module.exports = router;

@@ -1,6 +1,10 @@
+const uuid = require('uuid/v4');
+
 const HttpError = require('../models/http-error');
 const DUMMY_PLACES = require('../Dummy Data/places-data');
 
+
+// -------------------------------------------GET-------------------------------------------------- //
 
 // api/places/:pid => GET [controller for getting a place by place id]
 const getPlaceByPlaceId = (req, res, next) =>{  
@@ -33,8 +37,29 @@ const getPlacesByUserId = (req, res, next) =>{
 
 
 
+// -------------------------------------------POST-------------------------------------------------- //
+
+// api/places => POST [controller for creating a place]
+const createPlace = (req, res, next) =>{
+    const {title, description, coordinates, address, creator} = req.body;
+    const createdPlace = {
+        id: uuid(),
+        title,
+        description,
+        location: coordinates,
+        address,
+        creator
+    };
+    DUMMY_PLACES.push(createdPlace);
+
+    return res.status(201).json({place: createdPlace});
+}
+
+
+
 // Exporting controllers
 module.exports = {
     getPlaceByPlaceId,
-    getPlacesByUserId
+    getPlacesByUserId,
+    createPlace
 }

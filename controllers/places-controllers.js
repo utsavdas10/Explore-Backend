@@ -4,6 +4,7 @@ const HttpError = require('../models/http-error');
 const DUMMY_PLACES = require('../Dummy Data/places-data');
 
 
+
 // -------------------------------------------GET-------------------------------------------------- //
 
 // api/places/:pid => GET [controller for getting a place by place id]

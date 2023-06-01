@@ -58,9 +58,30 @@ const createPlace = (req, res, next) =>{
 
 
 
+// -------------------------------------------PATCH-------------------------------------------------- //
+
+// api/places/:pid => PATCH [controller for updating a place]
+const updatePlace = (req, res, next) =>{
+
+}
+
+
+
+// -------------------------------------------DELETE-------------------------------------------------- //
+
+// api/places/:pid => DELETE [controller for deleting a place]
+const deletePlace = (req, res, next) =>{
+
+}
+
+
+
+
 // Exporting controllers
 module.exports = {
     getPlaceByPlaceId,
     getPlacesByUserId,
-    createPlace
+    createPlace,
+    updatePlace,
+    deletePlace
 }

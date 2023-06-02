@@ -9,9 +9,6 @@ async function getCoordsForAddress(address) {
 //         address
 //         )}&key=${process.env.GOOGLE_API_KEY}`
 //     );
-//   axios.get().then((response)=>{
-//     const data = response.json();
-//   }).catch();
 
 //     const data = await response.json();
 

@@ -14,6 +14,7 @@ const app = express();
 //-----------------------Middlewares-----------------------//
 
 // Body parser middleware
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 

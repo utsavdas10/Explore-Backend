@@ -1,4 +1,4 @@
-const uuid = require('uuid/v4');
+const {v4: uuid} = require('uuid');
 
 const HttpError = require('../models/http-error');
 let DUMMY_PLACES = require('../Dummy Data/places-data');
@@ -66,7 +66,7 @@ const updatePlace = (req, res, next) =>{
     const {title, description} = req.body;
 
     const updatedPlace = {...DUMMY_PLACES.find(p => p.id === placeId)}; // {...} is used to create a copy of the object
-    const placeIndex = DUMMY_PLACES.findIndex(p => p.id === placeId); 
+    const placeIndex = DUMMY_PLACES.findIndex(p => p.id === placeId);
     updatedPlace.title = title;
     updatedPlace.description = description;
 

@@ -1,5 +1,6 @@
 // Third party imports
 const express = require('express');
+const {check} = require('express-validator');
 
 // Local imports
 const placesControllers = require('../controllers/places-controllers');
@@ -17,11 +18,26 @@ router.get('/user/:uid', placesControllers.getPlacesByUserId);
 
 
 // api/places => POST [ROUTE for creating a place]
-router.post('/', placesControllers.createPlace);
+router.post(
+    '/',
+    [
+        check('title').not().isEmpty(),
+        check('description').isLength({min: 5}),
+        check('address').not().isEmpty()
+    ],
+    placesControllers.createPlace
+);
 
 
 // api/places/:pid => PATCH [ROUTE for updating a place]
-router.patch('/:pid', placesControllers.updatePlace);
+router.patch(
+    '/:pid',
+    [
+        check('title').not().isEmpty(),
+        check('description').isLength({min: 5})
+    ],
+    placesControllers.updatePlace
+);
 
 
 // api/places/:pid => DELETE [ROUTE for deleting a place]

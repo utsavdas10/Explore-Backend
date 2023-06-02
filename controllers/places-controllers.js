@@ -1,4 +1,4 @@
-const {v4: uuid} = require('uuid');
+const {v4: uuidv4} = require('uuid');
 
 const HttpError = require('../models/http-error');
 let DUMMY_PLACES = require('../Dummy Data/places-data');
@@ -44,7 +44,7 @@ const getPlacesByUserId = (req, res, next) =>{
 const createPlace = (req, res, next) =>{
     const {title, description, coordinates, address, creator} = req.body;
     const createdPlace = {
-        id: uuid(),
+        id: uuidv4(),
         title,
         description,
         location: coordinates,
@@ -86,7 +86,6 @@ const deletePlace = (req, res, next) =>{
 
     return res.status(200).json({message: 'Place deleted successfully'});
 };
-
 
 
 

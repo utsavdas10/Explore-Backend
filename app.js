@@ -20,7 +20,7 @@ app.use(bodyParser.json());
 
 // Routes middleware initialization
 app.use('/api/places' ,placesRoutes);  
-app.use('api/users', usersRoutes);
+app.use('/api/users', usersRoutes);
 
 // Page not found middleware
 app.use((req, res, next) => {

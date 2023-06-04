@@ -1,3 +1,5 @@
+// JAVASCRIPT FILE FOR LOCATION UTILITIES
+
 async function getCoordsForAddress(address) {
   return {
     lat: 40.7484474,

@@ -1,10 +1,12 @@
+// Third party imports
 const {v4: uuidv4} = require('uuid');
 const {validationResult} = require('express-validator');
 
+// Local imports
 const HttpError = require('../models/http-error');
 const getCoordsForAddress = require('../util/location');
 let DUMMY_PLACES = require('../Dummy Data/places-data');
-
+const Place = require('../models/places');
 
 
 // -------------------------------------------GET-------------------------------------------------- //
@@ -63,15 +65,24 @@ const createPlace = async (req, res, next) =>{
         return next(error);
     } 
 
-    const createdPlace = {
-        id: uuidv4(),
+    const createdPlace = new Place({
         title,
         description,
         location: coordinatesFromAddress,
         address,
+        image: 'https://www.fcbarcelona.com/fcbarcelona/photo/2020/02/24/3f1215ed-07e8-47ef-b2c7-8a519f65b9cd/mini_UP3_20200105_FCB_VIS_View_1a_Empty.jpg',
         creator
-    };
-    DUMMY_PLACES.push(createdPlace);
+    });
+
+    try{
+        createdPlace.save().then(result => {
+            console.log(result);
+        });
+    }
+    catch(error){
+        const err = new HttpError('Creating place failed, please try again', 500);
+        return next(err);
+    }
 
     return res.status(201).json({place: createdPlace});
 };

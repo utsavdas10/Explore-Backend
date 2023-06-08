@@ -9,6 +9,7 @@ let DUMMY_PLACES = require('../Dummy Data/users-data');
 
 
 
+
 // -------------------------------------------GET-------------------------------------------------- //
 
 // api/users => GET [controller for getting all places]

@@ -12,6 +12,7 @@ const Place = require('../models/places');
 
 
 
+
 // -------------------------------------------GET-------------------------------------------------- //
 
 // api/places/:pid => GET [controller for getting a place by place id]

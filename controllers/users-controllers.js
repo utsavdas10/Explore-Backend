@@ -6,6 +6,8 @@ let DUMMY_PLACES = require('../Dummy Data/users-data');
 
 
 
+// -------------------------------------------CONTROLLERS-------------------------------------------------- //
+
 // -------------------------------------------GET-------------------------------------------------- //
 
 // api/users => GET [controller for getting all places]
@@ -15,6 +17,7 @@ const getAllUsers = (req, res, next) =>{
     }
     return res.json({DUMMY_PLACES});
 };
+
 
 
 

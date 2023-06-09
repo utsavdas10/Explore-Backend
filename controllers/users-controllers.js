@@ -1,10 +1,8 @@
 // Third party imports
-const { v4: uuidv4 } = require('uuid');
 const { validationResult } = require('express-validator');
 
 // Local imports
 const HttpError = require('../models/http-error');
-let DUMMY_PLACES = require('../Dummy Data/users-data');
 const User = require('../models/users');
 
 
@@ -48,7 +46,7 @@ const signup = async (req, res, next) =>{
         return next(err);
     }
 
-    const {name, email, password, places} = req.body;
+    const {name, email, password} = req.body;
 
     let existingUser;
     try{
@@ -69,7 +67,7 @@ const signup = async (req, res, next) =>{
         email,
         password,
         image: 'https://cdn.dribbble.com/users/1176657/screenshots/15468294/media/34af996ddff444391edab94abcf3c7f3.png?compress=1&resize=640x480&vertical=center',
-        places
+        places: []
     });
     try{
         await createdUser.save().then(() => console.log('User created!'));

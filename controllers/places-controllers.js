@@ -1,11 +1,12 @@
 // Third party imports
-const {v4: uuidv4} = require('uuid');
 const {validationResult} = require('express-validator');
+const mongoose = require('mongoose');
 
 // Local imports
 const HttpError = require('../models/http-error');
 const getCoordsForAddress = require('../util/location');
 const Place = require('../models/places');
+const User = require('../models/users');
 
 
 // -------------------------------------------CONTROLLERS-------------------------------------------------- //
@@ -76,9 +77,23 @@ const createPlace = async (req, res, next) =>{
 
     const {title, description, address, creator} = req.body;
 
+    let user;
+    try{
+        user = await User.findById(creator);
+    }
+    catch(err){
+        const error = new HttpError('Creating place failed, please try again', 500);
+        return next(error);
+    }
+
+    if(!user){
+        const error = new HttpError('Could not find user for provided id', 404);
+        return next(error);
+    }
+
     let coordinatesFromAddress;
     try{
-        coordinatesFromAddress = await getCoordsForAddress(address); // this is a promise
+        coordinatesFromAddress = await getCoordsForAddress(address);
     }
     catch(error){
         return next(error);
@@ -94,9 +109,16 @@ const createPlace = async (req, res, next) =>{
     });
 
     try{
-        createdPlace.save().then(result => {
-            console.log("Place created successfully");
-        });
+        // session is used to make sure that if one fails, the other one fails too
+        // if one fails, the other one will not be executed
+        // this is to make sure that if the place is not created, the user will not be created and vice versa
+        // if one fails, the changes are rolled back
+        const sess = await mongoose.startSession();
+        sess.startTransaction();
+        await createdPlace.save({session: sess}); 
+        user.places.push(createdPlace); // mongoose will automatically extract the id from the place
+        await user.save({session: sess}); 
+        await sess.commitTransaction(); // if both are successful, the changes are saved to the database
     }
     catch(error){
         const err = new HttpError('Creating place failed, please try again', 500);

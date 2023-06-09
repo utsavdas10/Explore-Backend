@@ -33,11 +33,12 @@ const getPlaceByPlaceId = async (req, res, next) =>{
         return next(error);
     }
 
-    res.json({place: place});
+    res.json({place: place.toObject({getters: true})});
 };
 
 
-// api/places/user/:uid => GET [controller for getting a place by user id]
+
+// api/places/user/:uid => GET [controller for getting places by user id]
 const getPlacesByUserId = async (req, res, next) =>{
     const userId = req.params.uid;
 
@@ -54,7 +55,7 @@ const getPlacesByUserId = async (req, res, next) =>{
         const error = new HttpError('Could not find a place for the provided user id', 404);
         return next(error);
     }
-    return res.json({places: userPlaces});
+    return res.json({places: userPlaces.map(place => place.toObject({getters: true}))});
 };
 
 
@@ -102,7 +103,7 @@ const createPlace = async (req, res, next) =>{
         return next(err);
     }
 
-    return res.status(201).json({place: createdPlace});
+    return res.status(201).json({place: createdPlace.toObject({getters: true})});
 };
 
 
@@ -116,7 +117,8 @@ const updatePlace = async (req, res, next) =>{
     const errors = validationResult(req);
     if(!errors.isEmpty()){
         console.log(errors); // for debugging
-        throw new HttpError('Invalid inputs passed, please check your data', 422);
+        const err = new HttpError('Invalid inputs passed, please check your data', 422);
+        return next(err);
     }
 
     const placeId = req.params.pid;
@@ -148,7 +150,7 @@ const updatePlace = async (req, res, next) =>{
         return next(error);
     }
 
-    return res.status(200).json({place: updatePlace});
+    return res.status(200).json({place: updatePlace.toObject({getters: true})});
 };
 
 

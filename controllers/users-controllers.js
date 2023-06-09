@@ -1,8 +1,11 @@
+// Third party imports
 const { v4: uuidv4 } = require('uuid');
 const { validationResult } = require('express-validator');
 
+// Local imports
 const HttpError = require('../models/http-error');
 let DUMMY_PLACES = require('../Dummy Data/users-data');
+const User = require('../models/users');
 
 
 // -------------------------------------------CONTROLLERS-------------------------------------------------- //
@@ -13,11 +16,21 @@ let DUMMY_PLACES = require('../Dummy Data/users-data');
 // -------------------------------------------GET-------------------------------------------------- //
 
 // api/users => GET [controller for getting all places]
-const getAllUsers = (req, res, next) =>{
-    if(!DUMMY_PLACES || DUMMY_PLACES.length === 0){
-        throw new HttpError('Could not find any user', 404);
+const getAllUsers = async (req, res, next) =>{
+    let users;
+    try{
+        users = await User.find({}, '-password');
     }
-    return res.json({DUMMY_PLACES});
+    catch(err){
+        const error = new HttpError('Fetching users failed, please try again later', 500);
+        return next(error);
+    }
+
+    if(users.length === 0 || !users){
+        const error = new HttpError('Could not find any users', 404);
+        return next(error);
+    }
+    return res.json({users: users.map(user => user.toObject({getters: true}))});
 };
 
 
@@ -26,40 +39,69 @@ const getAllUsers = (req, res, next) =>{
 // -------------------------------------------POST-------------------------------------------------- //
 
 // api/users/signup => POST [controller for signing up a user]
-const signup = (req, res, next) =>{
+const signup = async (req, res, next) =>{
 
     const errors = validationResult(req);
     if(!errors.isEmpty()){
         console.log(errors);
-        throw new HttpError('Invalid inputs passed, please check your data', 422);
+        const err = new HttpError('Invalid inputs passed, please check your data', 422);
+        return next(err);
     }
 
-    const {name, email, password} = req.body;
-    const hasUser = DUMMY_PLACES.find(user => user.email === email);
-    if(hasUser){
-        throw new HttpError('Could not create user, email already exists', 422);
+    const {name, email, password, places} = req.body;
+
+    let existingUser;
+    try{
+        existingUser = await User.findOne({email: email});
     }
-    const createdUser = {
-        id: uuidv4(),
+    catch(err){
+        const error = new HttpError('Signing up failed, please try again later', 500);
+        return next(error);
+    }
+
+    if(existingUser){
+        const error = new HttpError('User exists already, please login instead', 422);
+        return next(error);
+    }
+
+    createdUser = new User({
         name,
         email,
-        password
-    };
-    DUMMY_PLACES.push(createdUser);
-    return res.status(201).json({user: createdUser});
+        password,
+        image: 'https://cdn.dribbble.com/users/1176657/screenshots/15468294/media/34af996ddff444391edab94abcf3c7f3.png?compress=1&resize=640x480&vertical=center',
+        places
+    });
+    try{
+        await createdUser.save().then(() => console.log('User created!'));
+    }
+    catch(err){
+        const error = new HttpError('Signing up failed, please try again later', 500);
+        return next(error);
+    }
+
+    return res.status(201).json({user: createdUser.toObject({getters: true})});
 };
 
 
+
 // api/users/login => POST [controller for logging in a user]
-const login = (req, res, next) =>{
+const login = async (req, res, next) =>{
     const {email, password} = req.body;
-    const identifiedUser = DUMMY_PLACES.find(user => user.email === email);
-    if(!identifiedUser){
-        throw new HttpError('Could not identify user', 401);
+
+    let loginUser;
+    try{
+        loginUser = await User.findOne({email: email});
     }
-    else if(identifiedUser.password !== password){
-        throw new HttpError(`Wrong password for ${identifiedUser.email}`, 401);
+    catch(err){
+        const error = new HttpError('Logging in failed, please try again later', 500);
+        return next(error);
     }
+
+    if(!loginUser || loginUser.password !== password){
+        const error = new HttpError('Invalid credentials, could not log you in', 401);
+        return next(error);
+    }
+    
     return res.json({message: 'Logged in!'});
 };
 

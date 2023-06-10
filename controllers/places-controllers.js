@@ -57,6 +57,22 @@ const getPlacesByUserId = async (req, res, next) =>{
         return next(error);
     }
     return res.json({places: userPlaces.map(place => place.toObject({getters: true}))});
+
+    // let userWithPlaces;
+    // try{
+    //     userWithPlaces = await User.findById(userId).populate('places');
+    // }
+    // catch(err){
+    //     const error = new HttpError('Fetching places failed, please try again later', 500);
+    //     return next(error);
+    // }
+
+    // if(!userWithPlaces || userWithPlaces.places.length === 0){
+    //     const error = next(new HttpError('Could not find a place for the provided user id', 404));
+    //     return next(error);
+    // }
+
+    // return res.json({places: userWithPlaces.places.map(place => place.toObject({getters: true}))});
 };
 
 
@@ -113,12 +129,16 @@ const createPlace = async (req, res, next) =>{
         // if one fails, the other one will not be executed
         // this is to make sure that if the place is not created, the user will not be created and vice versa
         // if one fails, the changes are rolled back
+
         const sess = await mongoose.startSession();
         sess.startTransaction();
         await createdPlace.save({session: sess}); 
         user.places.push(createdPlace); // mongoose will automatically extract the id from the place
         await user.save({session: sess}); 
-        await sess.commitTransaction(); // if both are successful, the changes are saved to the database
+        await sess.commitTransaction().then(() => {
+            console.log('Place created successfully');
+        }); // if both are successful, the changes are saved to the 
+        
     }
     catch(error){
         const err = new HttpError('Creating place failed, please try again', 500);
@@ -181,11 +201,30 @@ const updatePlace = async (req, res, next) =>{
 // -------------------------------------------DELETE-------------------------------------------------- //
 
 // api/places/:pid => DELETE [controller for deleting a place]
-const deletePlace = (req, res, next) =>{
+const deletePlace = async (req, res, next) =>{
     const placeId = req.params.pid;
     
+    let place;
     try{
-        Place.findByIdAndDelete(placeId).then(() => {
+        place = await Place.findById(placeId).populate('creator');
+    }
+    catch(err){
+        const error = new HttpError('Something went wrong, could not delete place', 500);
+        return next(error);
+    }
+
+    if(!place){
+        const error = new HttpError('Could not find a place for the provided place id', 404);
+        return next(error);
+    }
+
+    try{
+        const sess = await mongoose.startSession();
+        sess.startTransaction();    
+        await Place.findByIdAndDelete(placeId, {session: sess});
+        place.creator.places.pull(place);
+        await place.creator.save({session: sess});
+        await sess.commitTransaction().then(() => {
             console.log('Place deleted successfully');
         });
     }

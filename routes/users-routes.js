@@ -4,6 +4,7 @@ const {check} = require('express-validator');
 
 // Local imports
 const usersControllers = require('../controllers/users-controllers');
+const fileUpload = require('../middlewares/file-upload');
 
 // Creating router
 const router = express.Router();
@@ -16,6 +17,7 @@ router.get('/', usersControllers.getAllUsers);
 // api/users/signup => POST [ROUTE for signing up a user]
 router.post(
     '/signup',
+    fileUpload.single('image'),
     [
         check('name').not().isEmpty(),
         check('email').normalizeEmail().isEmail(), // normalizeEmail() is used to convert the email to lowercase

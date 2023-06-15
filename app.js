@@ -1,3 +1,6 @@
+// Node imports
+const fs = require('fs');
+
 // Third party imports
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -17,6 +20,9 @@ const app = express();
 // Body parser middleware
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
+
+// Serving static images
+app.use('/uploads/images', express.static('uploads/images')); 
 
 
 // CORS middleware
@@ -44,9 +50,17 @@ app.use((req, res, next) => {
 
 // Error handling middleware
 app.use((error, req, res, next) => {
+    // Deleting the image if it exists
+    if(req.file){
+        fs.unlink(req.file.path, err => {
+            console.log(err);
+        });
+    }
+    // Checking if the response has already been sent
     if(res.headerSent){
         return next(error);
     }
+    // Sending the error
     res.status(error.code || 500);
     res.json({message: error.message || 'An unknown error occurred!'});
 });

@@ -17,7 +17,7 @@ router.get('/', usersControllers.getAllUsers);
 // api/users/signup => POST [ROUTE for signing up a user]
 router.post(
     '/signup',
-    fileUpload.single('image'),
+    fileUpload.single('image'), // single() is used to parse a single file
     [
         check('name').not().isEmpty(),
         check('email').normalizeEmail().isEmail(), // normalizeEmail() is used to convert the email to lowercase

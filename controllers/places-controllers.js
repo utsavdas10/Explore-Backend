@@ -1,3 +1,6 @@
+// Node imports
+const fs = require('fs');
+
 // Third party imports
 const {validationResult} = require('express-validator');
 const mongoose = require('mongoose');
@@ -120,7 +123,7 @@ const createPlace = async (req, res, next) =>{
         description,
         location: coordinatesFromAddress,
         address,
-        image: 'https://www.fcbarcelona.com/fcbarcelona/photo/2020/02/24/3f1215ed-07e8-47ef-b2c7-8a519f65b9cd/mini_UP3_20200105_FCB_VIS_View_1a_Empty.jpg',
+        image: req.file.path,
         creator
     });
 
@@ -218,6 +221,8 @@ const deletePlace = async (req, res, next) =>{
         return next(error);
     }
 
+    const imagePath = updatePlace.image;
+
     try{
         const sess = await mongoose.startSession();
         sess.startTransaction();    
@@ -232,6 +237,10 @@ const deletePlace = async (req, res, next) =>{
         const error = new HttpError('Something went wrong, could not delete place', 500);
         return next(error);
     }
+
+    fs.unlink(imagePath, err => {
+        console.log(err);
+    });
 
     return res.status(200).json({message: 'Place deleted successfully'});
 };

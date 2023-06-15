@@ -221,7 +221,7 @@ const deletePlace = async (req, res, next) =>{
         return next(error);
     }
 
-    const imagePath = updatePlace.image;
+    const imagePath = place.image;
 
     try{
         const sess = await mongoose.startSession();

@@ -1,6 +1,7 @@
 // Third party imports
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 // Local imports
 const HttpError = require('../models/http-error');
@@ -87,9 +88,23 @@ const signup = async (req, res, next) =>{
         return next(error);
     }
 
+    let token;
+    try{
+        token = jwt.sign(
+            {userId: createdUser.id, email: createdUser.email},
+            'supersecret_dont_share',
+            {expiresIn: '1h'}
+        );
+    }
+    catch(err){
+        const error = new HttpError('Signing up failed, please try again later', 500);
+        return next(error);
+    }
+    
     return res.status(201).json({
-        message:"Signed in Successfuly",
-        user: createdUser.toObject({getters: true})
+        userId: createdUser.id,
+        email: createdUser.email,
+        token: token
     });
 };
 
@@ -113,12 +128,7 @@ const login = async (req, res, next) =>{
         return next(error);
     }
 
-    if(!passwordMatch){
-        const error = new HttpError('Invalid credentials, could not log you in', 401);
-        return next(error);
-    }
-
-    let passwordMatch;
+    let passwordMatch = false;
     try{
         passwordMatch = await bcrypt.compare(password, loginUser.password);
     }
@@ -126,10 +136,30 @@ const login = async (req, res, next) =>{
         const error = new HttpError('Could not log you in, please check your credentials and try again', 500);
         return next(error);
     }
+
+    if(!passwordMatch) {
+        const error = new HttpError('Invalid credentials, could not log you in', 401);
+        return next(error);
+    }
+
+    // creating a token
+    let token;
+    try{
+        token = jwt.sign(
+            {userId: loginUser.id, email: loginUser.email}, // payload
+            'supersecret_dont_share', // secret key
+            {expiresIn: '1h'} // options
+        );
+    }
+    catch(err){
+        const error = new HttpError('Signing up failed, please try again later', 500);
+        return next(error);
+    }
     
     return res.json({
-        message: 'Logged in!',
-        user: loginUser.toObject({getters: true})
+        userId: loginUser.id,
+        email: loginUser.email,
+        token: token
     });
 };
 

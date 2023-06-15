@@ -1,6 +1,7 @@
 // Third party imports
 const express = require('express');
 const {check} = require('express-validator');
+const checkAuth = require('../middlewares/check-auth');
 
 // Local imports
 const placesControllers = require('../controllers/places-controllers');
@@ -16,6 +17,14 @@ router.get('/:pid', placesControllers.getPlaceByPlaceId);
 
 // api/places/user/:uid => GET [ROUTE for getting a place by user id]
 router.get('/user/:uid', placesControllers.getPlacesByUserId);
+
+
+// Authorizing all the routes below this middleware
+router.use(checkAuth);
+
+
+
+// -------------------------------Authorized Routes-------------------------------------- //
 
 
 // api/places => POST [ROUTE for creating a place]

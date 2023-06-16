@@ -1,3 +1,6 @@
+// Environment Variable Configuration
+require('dotenv').config();
+
 // Third party imports
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
@@ -92,7 +95,7 @@ const signup = async (req, res, next) =>{
     try{
         token = jwt.sign(
             {userId: createdUser.id, email: createdUser.email},
-            'supersecret_dont_share',
+            process.env.JWT_KEY,
             {expiresIn: '1h'}
         );
     }
@@ -147,7 +150,7 @@ const login = async (req, res, next) =>{
     try{
         token = jwt.sign(
             {userId: loginUser.id, email: loginUser.email}, // payload
-            'supersecret_dont_share', // secret key
+            process.env.JWT_KEY, // secret key
             {expiresIn: '1h'} // options
         );
     }

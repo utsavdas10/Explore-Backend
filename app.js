@@ -1,3 +1,6 @@
+// Environment Variable Configuration
+require('dotenv').config();
+
 // Node imports
 const fs = require('fs');
 
@@ -74,7 +77,7 @@ app.use((error, req, res, next) => {
 
 
 const port = process.env.PORT || 5000;
-const URL = "mongodb+srv://utsavdas10:utsavdas10@cluster0.p9102dl.mongodb.net/PlacesDB?retryWrites=true&w=majority"
+const URL = process.env.MONGO_URL;
 
 // Server initialization
 mongoose.connect(URL).then(() => {

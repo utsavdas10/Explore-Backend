@@ -1,7 +1,7 @@
 // Environment Variable Configuration
 require('dotenv').config();
 
-// Third party imports
+// Third party import
 const jwt = require('jsonwebtoken');
 
 // Local imports
@@ -18,6 +18,7 @@ module.exports = (req, res, next) => {
         if (!token) {
             throw new Error('Authentication failed');
         }
+        // Verify token
         const decodedToken = jwt.verify(token, process.env.JWT_KEY);
         req.userData = { userId: decodedToken.userId };
         next();

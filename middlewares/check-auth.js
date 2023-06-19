@@ -1,7 +1,7 @@
 // Environment Variable Configuration
 require('dotenv').config();
 
-// Third party import
+// Third party imports
 const jwt = require('jsonwebtoken');
 
 // Local imports
